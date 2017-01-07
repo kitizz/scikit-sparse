@@ -506,7 +506,7 @@ cdef class Common:
         out.nrow = m.shape[0]
         out.ncol = m.shape[1]
         out.nzmax = m.size
-        out.d = m.strides[1] // m.itemsize
+        out.d = out.nrow * (m.strides[1] // m.itemsize)
         out.x = m.data
         out.dtype = CHOLMOD_DOUBLE
         out.xtype = self._xtype
@@ -918,7 +918,7 @@ cdef class Factor:
         b = np.asarray(b)
         ndim = b.ndim
         if b.ndim == 1:
-            b = b[:, np.newaxis]
+            b = b.reshape(-1, 1)
         cdef cholmod_dense c_b
         cdef object ref = self._common._init_view_dense(&c_b, b)
         cdef cholmod_dense *out = cholmod_c_solve(
